@@ -1,4 +1,12 @@
-import { createContext, use, useCallback, useState } from "react";
+import {
+  useActionState,
+  Suspense,
+  createContext,
+  use,
+  useCallback,
+  useState,
+} from "react";
+import { useFormStatus } from "react-dom";
 
 interface ValueTypes {
   count: number;
@@ -26,24 +34,92 @@ const SampleContextProvider = ({ children }: { children: React.ReactNode }) => {
 const SampleButton = () => {
   const { count, handleIncrement, handleDecrement } = use(SampleContext);
   return (
-    <div className="flex flex-col gap-2 justify-center items-center">
-     <p className="text-3xl">sample counter actions using <strong>new react 19 </strong><code className="underline bg-slate-200">use</code> hook with context</p>
-     <div className="flex gap-4 text-2xl">
-      <button
-        className="border border-1 p-2 bg-green-400"
-        onClick={handleIncrement}
+    <Suspense fallback={<p>Loading...</p>}>
+      <div className="flex flex-col gap-2 justify-center items-center">
+        <p className="text-3xl">
+          sample counter actions using <strong>new react 19 </strong>
+          <code className="underline bg-slate-200">use</code> hook with context
+        </p>
+        <div className="flex gap-4 text-2xl">
+          <button
+            className="border border-1 p-2 bg-green-400"
+            onClick={handleIncrement}
+          >
+            Increment
+          </button>
+          <button
+            className="border border-1 p-2 bg-red-400"
+            onClick={handleDecrement}
+          >
+            Decrement
+          </button>
+        </div>
+        <p className="text-4xl">{count}</p>
+      </div>
+    </Suspense>
+  );
+};
+
+const UpdateUsername = () => {
+  const [name, setName] = useState("");
+  console.log("🚀 ~ UpdateUsername ~ name:", name);
+
+  const [error, submitAction, isPending] = useActionState(
+    async (prevState, formData) => {
+      console.log("🚀 ~ prevState:", prevState);
+      const err = await setName(formData.get("username"));
+      console.log("🚀 ~ err:", err);
+
+      if (err) {
+        return err;
+      }
+      handleTellFormStatus();
+      return null;
+    },
+    null
+  );
+  console.log(
+    "🚀 ~ const[error,submitAction,isPending]=useActionState ~ error:",
+    error,
+    submitAction.isPending
+  );
+  const { pending, data } = useFormStatus();
+
+  const handleTellFormStatus = () => {
+    console.log("🚀 ~ handleTellFormStatus ~ pending, data:", pending, data);
+  };
+
+  return (
+    <>
+      <form
+        action={submitAction}
+        className="flex flex-col gap-2 justify-center items-center"
       >
-        Increment
-      </button>
-      <button
-        className="border border-1 p-2 bg-red-400"
-        onClick={handleDecrement}
-      >
-        Decrement
-      </button>
-      </div> 
-      <p className="text-4xl">{count}</p>
-    </div>
+        <div>
+          <input
+            className="border p-2 rounded-sm"
+            type="text"
+            name="username"
+            placeholder="username"
+          />
+        </div>
+        <div>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="border p-2 rounded-sm bg-orange-400"
+          >
+            {isPending ? "Submitting..." : "Submit"}
+          </button>
+        </div>
+        {error ? (
+          <p className="text-red-500 text-xl text-center">{error}</p>
+        ) : null}
+        {name ? (
+          <p className="text-xl text-center">Submitted Data: {name}</p>
+        ) : null}
+      </form>
+    </>
   );
 };
 
@@ -51,6 +127,12 @@ function App() {
   return (
     <SampleContextProvider>
       <SampleButton />
+      <p className="text-center py-4 text-3xl text-black">
+        Example for{" "}
+        <code className="underline">useActionState(AnyPromiseFn)</code> and{" "}
+        <code className="underline">useFormStatus()</code>
+      </p>
+      <UpdateUsername />
     </SampleContextProvider>
   );
 }
