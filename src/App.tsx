@@ -62,13 +62,10 @@ const SampleButton = () => {
 
 const UpdateUsername = () => {
   const [name, setName] = useState("");
-  console.log("🚀 ~ UpdateUsername ~ name:", name);
 
   const [error, submitAction, isPending] = useActionState(
     async (prevState, formData) => {
-      console.log("🚀 ~ prevState:", prevState);
       const err = await setName(formData.get("username"));
-      console.log("🚀 ~ err:", err);
 
       if (err) {
         return err;
@@ -78,11 +75,7 @@ const UpdateUsername = () => {
     },
     null
   );
-  console.log(
-    "🚀 ~ const[error,submitAction,isPending]=useActionState ~ error:",
-    error,
-    submitAction.isPending
-  );
+ 
   const { pending, data } = useFormStatus();
 
   const handleTellFormStatus = () => {
