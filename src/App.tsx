@@ -5,8 +5,12 @@ import {
   use,
   useCallback,
   useState,
+  useRef,
 } from "react";
 import { useFormStatus } from "react-dom";
+import { InfiniteScroll } from "./components/InfiniteScroll";
+
+
 
 interface ValueTypes {
   count: number;
@@ -75,7 +79,7 @@ const UpdateUsername = () => {
     },
     null
   );
- 
+
   const { pending, data } = useFormStatus();
 
   const handleTellFormStatus = () => {
@@ -126,6 +130,7 @@ function App() {
         <code className="underline">useFormStatus()</code>
       </p>
       <UpdateUsername />
+      <InfiniteScroll />
     </SampleContextProvider>
   );
 }
