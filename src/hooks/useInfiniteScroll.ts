@@ -1,6 +1,12 @@
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useEffect } from "react";
 
-export const useInfiniteScroll = ({ onLoadMore = () => {}, ref = null }) => {
+export const useInfiniteScroll = ({
+  onLoadMore,
+  ref,
+}: {
+  onLoadMore: () => void;
+  ref: MutableRefObject<HTMLElement | null>;
+}) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -21,5 +27,5 @@ export const useInfiniteScroll = ({ onLoadMore = () => {}, ref = null }) => {
         observer.unobserve(ref.current);
       }
     };
-  }, [ref?.current]);
+  }, [ref.current]);
 };

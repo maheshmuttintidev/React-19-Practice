@@ -5,12 +5,9 @@ import {
   use,
   useCallback,
   useState,
-  useRef,
 } from "react";
 import { useFormStatus } from "react-dom";
 import { InfiniteScroll } from "./components/InfiniteScroll";
-
-
 
 interface ValueTypes {
   count: number;
@@ -18,18 +15,26 @@ interface ValueTypes {
   handleDecrement: () => void;
 }
 
-const SampleContext = createContext(null);
+const initialState = {
+  count: 0,
+  handleIncrement: () => {},
+  handleDecrement: () => {},
+};
+
+const SampleContext = createContext<ValueTypes>(initialState);
 
 const SampleContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [count, setCount] = useState(0);
+
   const handleIncrement = useCallback(() => {
     setCount((prevState) => prevState + 1);
   }, []);
+
   const handleDecrement = useCallback(() => {
     setCount((prevState) => prevState - 1);
   }, []);
 
-  const value: ValueTypes | null = { count, handleIncrement, handleDecrement };
+  const value: ValueTypes = { count, handleIncrement, handleDecrement };
   return (
     <SampleContext.Provider value={value}>{children}</SampleContext.Provider>
   );
@@ -68,8 +73,8 @@ const UpdateUsername = () => {
   const [name, setName] = useState("");
 
   const [error, submitAction, isPending] = useActionState(
-    async (prevState, formData) => {
-      const err = await setName(formData.get("username"));
+    async (_: unknown, formData: HTMLFormElement) => {
+      const err: unknown = await setName(formData.get("username"));
 
       if (err) {
         return err;
